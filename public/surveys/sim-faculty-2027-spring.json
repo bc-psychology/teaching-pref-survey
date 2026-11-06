@@ -1,0 +1,1116 @@
+{
+  "format": "tps-survey",
+  "schema_version": 1,
+  "id": "sim-faculty-2027-spring",
+  "title": "Simulation — Teaching Preferences Survey — Faculty, Spring 2027",
+  "term": "2027-spring",
+  "version": 1,
+  "closes": "2026-12-04",
+  "submit_url": "https://teaching-pref-survey.teaching-pref-survey.workers.dev/submit",
+  "intro": "This survey is for the **Spring 2027** semester, with an extra question if you want to teach over the **Winter 2027** intersession too.\n\nPlease give as much detail as possible. If we missed anything, you can tell us in the last question. Thanks!",
+  "thanks": "Thank you! Your answers help us build the schedule. If anything changes, you can submit again with the same link and we will use your latest answers.",
+  "questions": [
+    {
+      "id": "name",
+      "type": "text",
+      "text": "What is your name?",
+      "required": true
+    },
+    {
+      "id": "email",
+      "type": "email",
+      "text": "What is your email?",
+      "required": true
+    },
+    {
+      "id": "teach_spring",
+      "type": "yesno",
+      "text": "Do you anticipate teaching during the Spring 2027 semester?",
+      "required": true
+    },
+    {
+      "id": "credit_sources",
+      "type": "numbers",
+      "text": "How many workload credits do you anticipate getting from each of these sources during the Spring 2027 semester?",
+      "options": [
+        "Teaching at Brooklyn College",
+        "Student supervision (e.g., independent research/reading, internship, dissertation)",
+        "Course release (e.g., new faculty release time, grants, service)",
+        "Other (e.g., teaching at the GC)"
+      ],
+      "settings": {
+        "min": "0",
+        "max": "10",
+        "step": "0.5",
+        "total": "yes",
+        "unit": "credits"
+      }
+    },
+    {
+      "id": "modality",
+      "type": "choice",
+      "text": "What is your preferred teaching modality?",
+      "help": "We are moving the majority of courses in person, and the college rule still applies: at least 1 course per semester must be in person unless you have an HR waiver. Online courses are expected to have an in-person final exam.",
+      "options": [
+        "All in-person",
+        "A mix of in-person and online",
+        "Prefer online as possible"
+      ],
+      "required": true
+    },
+    {
+      "id": "exam_info",
+      "type": "info",
+      "text": "Final exams for online courses",
+      "help": "All online courses have an in-person final exam.\n\nOnline synchronous final exams are held during the time slot that goes with your bell code (e.g., EW6).\n\nIf you want to teach an online asynchronous course, tell us below when during finals week you are available to hold the exam ([academic calendar](https://www.brooklyn.edu/registrar/academic-calendars/)). Scheduling sets the exact day and time, but we can request your preferred slot. The late afternoon and evening slots are generally easier to book.",
+      "show_if": "modality != All in-person"
+    },
+    {
+      "id": "exam_slots",
+      "type": "checkboxes",
+      "text": "If you teach an online asynchronous course, which finals-week exam slots would work for you?",
+      "options": [
+        "8:00–10:00 am",
+        "10:30 am–12:30 pm",
+        "1:00–3:00 pm",
+        "3:30–5:30 pm",
+        "6:00–8:00 pm",
+        "8:30–10:30 pm"
+      ],
+      "show_if": "modality != All in-person"
+    },
+    {
+      "id": "courses",
+      "type": "courses",
+      "text": "Which classes do you want to teach?",
+      "help": "Pick your classes in order of preference, and add any notes beside each one (e.g., jumbo section, multiple sections, master's class, doctoral class). Add as many as you like.",
+      "required": true,
+      "show_if": "teach_spring = Yes",
+      "settings": {
+        "levels": "ug,grad",
+        "max": "7",
+        "notes": "yes"
+      }
+    },
+    {
+      "id": "availability",
+      "type": "availability",
+      "text": "What days and times are you available to teach? Any preferred?",
+      "help": "Click or drag across the blocks when you can teach. Switch to **Preferred** to mark the times you like best. Classes are scheduled in the college's standard [bell code](https://employees.brooklyn.edu/base/fall-and-spring-bell-codes/) slots, so longer classes need several blocks in a row.",
+      "required": true,
+      "show_if": "teach_spring = Yes",
+      "settings": {
+        "days": "M,T,W,Th,F,Sa,Su",
+        "notes": "yes"
+      }
+    },
+    {
+      "id": "teach_winter",
+      "type": "yesno",
+      "text": "Do you want to teach during the Winter 2027 intersession?",
+      "help": "Winter teaching counts toward your annual workload.",
+      "required": true
+    },
+    {
+      "id": "winter_courses",
+      "type": "courses",
+      "text": "For the Winter intersession, which class(es) do you want to teach?",
+      "show_if": "teach_winter = Yes",
+      "settings": {
+        "levels": "ug,grad",
+        "max": "3",
+        "notes": "yes"
+      }
+    },
+    {
+      "id": "winter_details",
+      "type": "longtext",
+      "text": "For the Winter intersession, what days, times and format would you like? If online, when would you like to hold the in-person final exam?",
+      "show_if": "teach_winter = Yes"
+    },
+    {
+      "id": "anything_else",
+      "type": "longtext",
+      "text": "Is there anything else you would like us to know?"
+    }
+  ],
+  "courses": [
+    {
+      "code": "PSYC 1000",
+      "title": "Introductory Psychology",
+      "level": "ug",
+      "group": "General Psychology"
+    },
+    {
+      "code": "PSYC 1010",
+      "title": "The Future of Work: Navigating College and Careers",
+      "level": "ug",
+      "group": "General Psychology"
+    },
+    {
+      "code": "PSYC 2001",
+      "title": "Laboratory Experience",
+      "level": "ug",
+      "group": "Statistics and research methods"
+    },
+    {
+      "code": "PSYC 2002",
+      "title": "Laboratory Experience 2",
+      "level": "ug",
+      "group": "Statistics and research methods"
+    },
+    {
+      "code": "PSYC 2003",
+      "title": "Laboratory Experience 3",
+      "level": "ug",
+      "group": "Statistics and research methods"
+    },
+    {
+      "code": "PSYC 2004",
+      "title": "Laboratory Experience 4",
+      "level": "ug",
+      "group": "Statistics and research methods"
+    },
+    {
+      "code": "PSYC 2010",
+      "title": "Careers in Psychology",
+      "level": "ug"
+    },
+    {
+      "code": "PSYC 2090",
+      "title": "Special Topics",
+      "level": "ug",
+      "group": "General Psychology"
+    },
+    {
+      "code": "PSYC 2091",
+      "title": "Fieldwork in Psychology",
+      "level": "ug",
+      "group": "General Psychology"
+    },
+    {
+      "code": "PSYC 2100",
+      "title": "Social Psychology",
+      "level": "ug",
+      "group": "Social psychology"
+    },
+    {
+      "code": "PSYC 2200",
+      "title": "Lifespan Development",
+      "level": "ug",
+      "group": "Developmental psychology"
+    },
+    {
+      "code": "PSYC 2210",
+      "title": "Introductory Child Psychology",
+      "level": "ug",
+      "group": "Developmental psychology"
+    },
+    {
+      "code": "PSYC 2300",
+      "title": "Introduction to Personality",
+      "level": "ug",
+      "group": "Personality psychology"
+    },
+    {
+      "code": "PSYC 2530",
+      "title": "Introduction to Cognitive Psychology",
+      "level": "ug",
+      "group": "Cognition, learning, perception and emotion"
+    },
+    {
+      "code": "PSYC 2600",
+      "title": "Mind, Brain, and Behavior",
+      "level": "ug",
+      "group": "Biopsychology and neuroscience"
+    },
+    {
+      "code": "PSYC 2610",
+      "title": "Neurobiology",
+      "level": "ug",
+      "group": "Biopsychology and neuroscience"
+    },
+    {
+      "code": "PSYC 2710",
+      "title": "Introduction to Forensic Psychology",
+      "level": "ug",
+      "group": "History, systems, and advanced general psychology"
+    },
+    {
+      "code": "PSYC 2810",
+      "title": "Psychological Disorders I",
+      "level": "ug",
+      "group": "Psychopathology and clinical applications"
+    },
+    {
+      "code": "PSYC 3020",
+      "title": "Ethics in Psychology",
+      "level": "ug",
+      "group": "General Psychology"
+    },
+    {
+      "code": "PSYC 3030",
+      "title": "Psychological Perspectives in Diversity Science",
+      "level": "ug",
+      "group": "General Psychology"
+    },
+    {
+      "code": "PSYC 3040",
+      "title": "Political Psychology",
+      "level": "ug",
+      "group": "General Psychology"
+    },
+    {
+      "code": "PSYC 3090",
+      "title": "Advanced Special Topics in Psychology",
+      "level": "ug",
+      "group": "General Psychology"
+    },
+    {
+      "code": "PSYC 3110",
+      "title": "Psychology of Prejudice",
+      "level": "ug",
+      "group": "Social psychology"
+    },
+    {
+      "code": "PSYC 3120",
+      "title": "Cultural Psychology",
+      "level": "ug",
+      "group": "Social psychology"
+    },
+    {
+      "code": "PSYC 3130",
+      "title": "Relationship Science",
+      "level": "ug",
+      "group": "Social psychology"
+    },
+    {
+      "code": "PSYC 3140",
+      "title": "Small Groups",
+      "level": "ug",
+      "group": "Social psychology"
+    },
+    {
+      "code": "PSYC 3150",
+      "title": "Drugs, Behavior and Society",
+      "level": "ug",
+      "group": "Social psychology"
+    },
+    {
+      "code": "PSYC 3160",
+      "title": "Psychology for a Better Society",
+      "level": "ug",
+      "group": "Social psychology"
+    },
+    {
+      "code": "PSYC 3171",
+      "title": "Introduction to Industrial and Organizational Psychology",
+      "level": "ug",
+      "group": "Social psychology"
+    },
+    {
+      "code": "PSYC 3172",
+      "title": "Strategic Human Resource Management",
+      "level": "ug",
+      "group": "Social psychology"
+    },
+    {
+      "code": "PSYC 3174",
+      "title": "Organizational Diagnosis and Intervention",
+      "level": "ug",
+      "group": "Social psychology"
+    },
+    {
+      "code": "PSYC 3180",
+      "title": "Health Psychology",
+      "level": "ug",
+      "group": "Social psychology"
+    },
+    {
+      "code": "PSYC 3195",
+      "title": "Advanced Special Topics in Social Psychology",
+      "level": "ug",
+      "group": "Social psychology"
+    },
+    {
+      "code": "PSYC 3220",
+      "title": "Cognitive Development",
+      "level": "ug",
+      "group": "Developmental psychology"
+    },
+    {
+      "code": "PSYC 3230",
+      "title": "Social and Personality Development of Children",
+      "level": "ug",
+      "group": "Developmental psychology"
+    },
+    {
+      "code": "PSYC 3240",
+      "title": "Psychological and Developmental Disorders of Childhood",
+      "level": "ug",
+      "group": "Developmental psychology"
+    },
+    {
+      "code": "PSYC 3250",
+      "title": "Psychology of Adolescence",
+      "level": "ug",
+      "group": "Developmental psychology"
+    },
+    {
+      "code": "PSYC 3260",
+      "title": "Psychology of Aging",
+      "level": "ug",
+      "group": "Developmental psychology"
+    },
+    {
+      "code": "PSYC 3270",
+      "title": "Psychology of the Family",
+      "level": "ug",
+      "group": "Developmental psychology"
+    },
+    {
+      "code": "PSYC 3295",
+      "title": "Advanced Special Topics in Developmental Psychology",
+      "level": "ug",
+      "group": "Developmental psychology"
+    },
+    {
+      "code": "PSYC 3300",
+      "title": "Theories of Personality",
+      "level": "ug",
+      "group": "Personality psychology"
+    },
+    {
+      "code": "PSYC 3360",
+      "title": "Psychology of Gender",
+      "level": "ug",
+      "group": "Personality psychology"
+    },
+    {
+      "code": "PSYC 3370",
+      "title": "Hypnosis and Related Phenomena",
+      "level": "ug",
+      "group": "Personality psychology"
+    },
+    {
+      "code": "PSYC 3396",
+      "title": "Advanced Special Topics in Personality Psychology",
+      "level": "ug",
+      "group": "Personality psychology"
+    },
+    {
+      "code": "PSYC 3400",
+      "title": "Statistical Methods in Psychological Research",
+      "level": "ug",
+      "group": "Statistics and research methods"
+    },
+    {
+      "code": "PSYC 3450W",
+      "title": "Experimental Psychology",
+      "level": "ug",
+      "group": "Statistics and research methods"
+    },
+    {
+      "code": "PSYC 3470",
+      "title": "Data Analytics and Data Visualization in the Social and Behavioral Sciences",
+      "level": "ug",
+      "group": "Statistics and research methods"
+    },
+    {
+      "code": "PSYC 3495",
+      "title": "Advanced Special Topics in Statistics and Research Methods",
+      "level": "ug",
+      "group": "Statistics and research methods"
+    },
+    {
+      "code": "PSYC 3510",
+      "title": "Learning",
+      "level": "ug",
+      "group": "Cognition, learning, perception and emotion"
+    },
+    {
+      "code": "PSYC 3520",
+      "title": "Sensation and Perception",
+      "level": "ug",
+      "group": "Cognition, learning, perception and emotion"
+    },
+    {
+      "code": "PSYC 3530",
+      "title": "Advanced Cognitive Psychology",
+      "level": "ug",
+      "group": "Cognition, learning, perception and emotion"
+    },
+    {
+      "code": "PSYC 3540",
+      "title": "Psychology of Language",
+      "level": "ug",
+      "group": "Cognition, learning, perception and emotion"
+    },
+    {
+      "code": "PSYC 3541",
+      "title": "Thought and Language",
+      "level": "ug",
+      "group": "Cognition, learning, perception and emotion"
+    },
+    {
+      "code": "PSYC 3550",
+      "title": "Psychology of Emotion",
+      "level": "ug",
+      "group": "Cognition, learning, perception and emotion"
+    },
+    {
+      "code": "PSYC 3580",
+      "title": "Philosophy and Artificial Intelligence",
+      "level": "ug",
+      "group": "Cognition, learning, perception and emotion"
+    },
+    {
+      "code": "PSYC 3585",
+      "title": "Parapsychology: A Critical Examination",
+      "level": "ug",
+      "group": "Cognition, learning, perception and emotion"
+    },
+    {
+      "code": "PSYC 3590",
+      "title": "Psychology of the Arts",
+      "level": "ug",
+      "group": "Cognition, learning, perception and emotion"
+    },
+    {
+      "code": "PSYC 3595",
+      "title": "Advanced Special Topics in Cognitive Psychology",
+      "level": "ug",
+      "group": "Cognition, learning, perception and emotion"
+    },
+    {
+      "code": "PSYC 3600",
+      "title": "Behavioral Neuroscience",
+      "level": "ug",
+      "group": "Biopsychology and neuroscience"
+    },
+    {
+      "code": "PSYC 3610",
+      "title": "Behavioral Neuroendocrinology",
+      "level": "ug",
+      "group": "Biopsychology and neuroscience"
+    },
+    {
+      "code": "PSYC 3660",
+      "title": "Drugs and Behavior",
+      "level": "ug",
+      "group": "Biopsychology and neuroscience"
+    },
+    {
+      "code": "PSYC 3670",
+      "title": "Comparative Psychology",
+      "level": "ug",
+      "group": "Biopsychology and neuroscience"
+    },
+    {
+      "code": "PSYC 3680",
+      "title": "Human Neuropsychology",
+      "level": "ug",
+      "group": "Biopsychology and neuroscience"
+    },
+    {
+      "code": "PSYC 3695",
+      "title": "Advanced Special Topics in Behavioral Neuroscience",
+      "level": "ug",
+      "group": "Biopsychology and neuroscience"
+    },
+    {
+      "code": "PSYC 3700",
+      "title": "History of Psychology",
+      "level": "ug",
+      "group": "History, systems, and advanced general psychology"
+    },
+    {
+      "code": "PSYC 3810",
+      "title": "Psychological Disorders II",
+      "level": "ug",
+      "group": "Psychopathology and clinical applications"
+    },
+    {
+      "code": "PSYC 3820",
+      "title": "Fundamentals of Psychotherapy",
+      "level": "ug",
+      "group": "Psychopathology and clinical applications"
+    },
+    {
+      "code": "PSYC 3825",
+      "title": "Cognitive Behavioral Therapy",
+      "level": "ug",
+      "group": "Psychopathology and clinical applications"
+    },
+    {
+      "code": "PSYC 3830",
+      "title": "The Counseling Process: Theory and Technique",
+      "level": "ug",
+      "group": "Psychopathology and clinical applications"
+    },
+    {
+      "code": "PSYC 3840",
+      "title": "Psychoanalysis: Theory and Research",
+      "level": "ug",
+      "group": "Psychopathology and clinical applications"
+    },
+    {
+      "code": "PSYC 3850",
+      "title": "Tests and Measurements",
+      "level": "ug",
+      "group": "Psychopathology and clinical applications"
+    },
+    {
+      "code": "PSYC 3895",
+      "title": "Advanced Special Topics in Psychopathology and Clinical Application",
+      "level": "ug",
+      "group": "Psychopathology and clinical applications"
+    },
+    {
+      "code": "PSYC 4210",
+      "title": "Field Experience in Child Psychology",
+      "level": "ug",
+      "group": "Developmental psychology"
+    },
+    {
+      "code": "PSYC 4400",
+      "title": "Advanced Psychological Statistics",
+      "level": "ug",
+      "group": "Statistics and research methods"
+    },
+    {
+      "code": "PSYC 4800",
+      "title": "Field Experience in Mental Health and Adult Psychology",
+      "level": "ug",
+      "group": "Psychopathology and clinical applications"
+    },
+    {
+      "code": "PSYC 5001",
+      "title": "Independent Research I",
+      "level": "ug",
+      "group": "Honors courses"
+    },
+    {
+      "code": "PSYC 5002",
+      "title": "Independent Research II",
+      "level": "ug",
+      "group": "Honors courses"
+    },
+    {
+      "code": "PSYC 5003",
+      "title": "Independent Research III",
+      "level": "ug",
+      "group": "Honors courses"
+    },
+    {
+      "code": "PSYC 5004",
+      "title": "Independent Research IV",
+      "level": "ug",
+      "group": "Honors courses"
+    },
+    {
+      "code": "PSYC 5011",
+      "title": "Fieldwork I",
+      "level": "ug",
+      "group": "Honors courses"
+    },
+    {
+      "code": "PSYC 5012",
+      "title": "Fieldwork II",
+      "level": "ug",
+      "group": "Honors courses"
+    },
+    {
+      "code": "PSYC 5013",
+      "title": "Fieldwork III",
+      "level": "ug",
+      "group": "Honors courses"
+    },
+    {
+      "code": "PSYC 5014",
+      "title": "Fieldwork IV",
+      "level": "ug",
+      "group": "Honors courses"
+    },
+    {
+      "code": "PSYC 7101G",
+      "title": "Human Relations Training Seminar I",
+      "level": "grad"
+    },
+    {
+      "code": "PSYC 7105G",
+      "title": "Quantitative Techniques in Industrial and Organizational Psychology",
+      "level": "grad"
+    },
+    {
+      "code": "PSYC 7106G",
+      "title": "Research and Program Evaluation Methods in Applied Psychology",
+      "level": "grad"
+    },
+    {
+      "code": "PSYC 7109G",
+      "title": "Special Topics in Group Processes and Organizational Behavior",
+      "level": "grad"
+    },
+    {
+      "code": "PSYC 7110G",
+      "title": "Theories of Group Process I",
+      "level": "grad"
+    },
+    {
+      "code": "PSYC 7112G",
+      "title": "Intervention Theory and Practice I",
+      "level": "grad"
+    },
+    {
+      "code": "PSYC 7113G",
+      "title": "Intervention Theory and Practice II",
+      "level": "grad"
+    },
+    {
+      "code": "PSYC 7114G",
+      "title": "Psychology of Small Groups I",
+      "level": "grad"
+    },
+    {
+      "code": "PSYC 7115G",
+      "title": "Psychology of Small Groups II",
+      "level": "grad"
+    },
+    {
+      "code": "PSYC 7121G",
+      "title": "Assessing Organizational Structure and Design",
+      "level": "grad"
+    },
+    {
+      "code": "PSYC 7122G",
+      "title": "Organizational Diagnosis and Consultation",
+      "level": "grad"
+    },
+    {
+      "code": "PSYC 7144G",
+      "title": "Leadership in Organizations",
+      "level": "grad"
+    },
+    {
+      "code": "PSYC 7209G",
+      "title": "Special Topics in Personnel and Human Resources",
+      "level": "grad"
+    },
+    {
+      "code": "PSYC 7210G",
+      "title": "Psychological Concepts and Methods: Issues in Industrial and Organizational Psychology",
+      "level": "grad"
+    },
+    {
+      "code": "PSYC 7224G",
+      "title": "The Psychology of Work",
+      "level": "grad"
+    },
+    {
+      "code": "PSYC 7225G",
+      "title": "Planning and Control System Psychology",
+      "level": "grad"
+    },
+    {
+      "code": "PSYC 7226G",
+      "title": "Psychology of Technology and Information Systems Implementation",
+      "level": "grad"
+    },
+    {
+      "code": "PSYC 7228G",
+      "title": "Workplace Communication in Organizations",
+      "level": "grad"
+    },
+    {
+      "code": "PSYC 7231G",
+      "title": "Group Relations Issues in Organizational Psychology",
+      "level": "grad"
+    },
+    {
+      "code": "PSYC 7232G",
+      "title": "Training and Development",
+      "level": "grad"
+    },
+    {
+      "code": "PSYC 7235G",
+      "title": "Small Work Group Consultation",
+      "level": "grad"
+    },
+    {
+      "code": "PSYC 7236G",
+      "title": "Job Analysis and Employee Selection",
+      "level": "grad"
+    },
+    {
+      "code": "PSYC 7237G",
+      "title": "Occupational Health Psychology",
+      "level": "grad"
+    },
+    {
+      "code": "PSYC 7241G",
+      "title": "The Individual in the Organization",
+      "level": "grad"
+    },
+    {
+      "code": "PSYC 7242G",
+      "title": "Human Resources Management Applications",
+      "level": "grad"
+    },
+    {
+      "code": "PSYC 7243G",
+      "title": "Labor Relations: Quality of Working Life Issues, Productivity, and Unions",
+      "level": "grad"
+    },
+    {
+      "code": "PSYC 7245G",
+      "title": "Career Development",
+      "level": "grad"
+    },
+    {
+      "code": "PSYC 7246G",
+      "title": "International Human Resource Management",
+      "level": "grad"
+    },
+    {
+      "code": "PSYC 7247G",
+      "title": "Managing Diversity in the Global Economy",
+      "level": "grad"
+    },
+    {
+      "code": "PSYC 7248G",
+      "title": "Gender and the Workplace",
+      "level": "grad"
+    },
+    {
+      "code": "PSYC 7410G",
+      "title": "Foundations of Mental Health Counseling",
+      "level": "grad"
+    },
+    {
+      "code": "PSYC 7421G",
+      "title": "Assessment Techniques",
+      "level": "grad"
+    },
+    {
+      "code": "PSYC 7431G",
+      "title": "Assessment Practicum",
+      "level": "grad"
+    },
+    {
+      "code": "PSYC 7441G",
+      "title": "Social, Linguistic and Cultural Foundations of Counseling",
+      "level": "grad"
+    },
+    {
+      "code": "PSYC 7442G",
+      "title": "Psychodynamic Approaches to Counseling and Psychotherapy",
+      "level": "grad"
+    },
+    {
+      "code": "PSYC 7443G",
+      "title": "Cognitive and Behavioral Approaches to Counseling and Psychotherapy",
+      "level": "grad"
+    },
+    {
+      "code": "PSYC 7449G",
+      "title": "Mental Health Counseling Practicum",
+      "level": "grad"
+    },
+    {
+      "code": "PSYC 7509G",
+      "title": "Special Topics in Mental Health Counseling",
+      "level": "grad"
+    },
+    {
+      "code": "PSYC 7544G",
+      "title": "Experiential Approaches to Counseling and Psychotherapy",
+      "level": "grad"
+    },
+    {
+      "code": "PSYC 7545G",
+      "title": "Assessment, Counseling and Psychotherapy with Couples and Families",
+      "level": "grad"
+    },
+    {
+      "code": "PSYC 7546G",
+      "title": "Child and Adolescent Mental Health Counseling",
+      "level": "grad"
+    },
+    {
+      "code": "PSYC 7551G",
+      "title": "Biological, Psychological, and Social Aspects of Aging",
+      "level": "grad"
+    },
+    {
+      "code": "PSYC 7552G",
+      "title": "Psychopathology and Aging",
+      "level": "grad"
+    },
+    {
+      "code": "PSYC 7553G",
+      "title": "Mental Health Assessment of Older Adults",
+      "level": "grad"
+    },
+    {
+      "code": "PSYC 7554G",
+      "title": "Clinical Perspectives and Psychological Interventions with Older Adults",
+      "level": "grad"
+    },
+    {
+      "code": "PSYC 7555G",
+      "title": "Geriatric Mental Health Practicum",
+      "level": "grad"
+    },
+    {
+      "code": "PSYC 7562G",
+      "title": "Parent-Child Dyad Relational Health",
+      "level": "grad"
+    },
+    {
+      "code": "PSYC 7563G",
+      "title": "Biopsychosocial Aspects of the Perinatal Period",
+      "level": "grad"
+    },
+    {
+      "code": "PSYC 7564G",
+      "title": "Social Determinants of Health and Psychological Health Inequities during the Perinatal Period",
+      "level": "grad"
+    },
+    {
+      "code": "PSYC 7566G",
+      "title": "Psychopathological Conditions during the Perinatal Stage",
+      "level": "grad"
+    },
+    {
+      "code": "PSYC 7568G",
+      "title": "Clinical Assessment and Intervention for Perinatal Mental Health Issues",
+      "level": "grad"
+    },
+    {
+      "code": "PSYC 7569G",
+      "title": "Perinatal Mental Health Practicum",
+      "level": "grad"
+    },
+    {
+      "code": "PSYC 7571G",
+      "title": "Neuroscience, Trauma, Psychopharmacology, and Severe Mental Illness in Mental Health Counseling",
+      "level": "grad"
+    },
+    {
+      "code": "PSYC 7572G",
+      "title": "Substance Misuse and Compulsive Behaviors",
+      "level": "grad"
+    },
+    {
+      "code": "PSYC 7591G",
+      "title": "Mental Health Counseling Internship I",
+      "level": "grad"
+    },
+    {
+      "code": "PSYC 7592G",
+      "title": "Mental Health Counseling Internship II",
+      "level": "grad"
+    },
+    {
+      "code": "PSYC 7701G",
+      "title": "Professional Development Seminar",
+      "level": "grad"
+    },
+    {
+      "code": "PSYC 7709G",
+      "title": "Special Topics in Experimental Psychology",
+      "level": "grad"
+    },
+    {
+      "code": "PSYC 7750G",
+      "title": "Data Skills for Reproducible Psychological Research",
+      "level": "grad"
+    },
+    {
+      "code": "PSYC 7765G",
+      "title": "Statistical Methods Applications I",
+      "level": "grad"
+    },
+    {
+      "code": "PSYC 7766G",
+      "title": "Statistical Methods Applications II",
+      "level": "grad"
+    },
+    {
+      "code": "PSYC 7780G",
+      "title": "Quantitative Methods in Psychology",
+      "level": "grad"
+    },
+    {
+      "code": "PSYC 7781G",
+      "title": "Research in Psychology",
+      "level": "grad"
+    },
+    {
+      "code": "PSYC 7782G",
+      "title": "Research Proposal in Psychology",
+      "level": "grad"
+    },
+    {
+      "code": "PSYC 7791G",
+      "title": "Independent Reading I",
+      "level": "grad"
+    },
+    {
+      "code": "PSYC 7792G",
+      "title": "Independent Reading II",
+      "level": "grad"
+    },
+    {
+      "code": "PSYC 7795G",
+      "title": "Independent Psychological Research I",
+      "level": "grad"
+    },
+    {
+      "code": "PSYC 7796G",
+      "title": "Independent Psychological Research II",
+      "level": "grad"
+    },
+    {
+      "code": "PSYC 7798G",
+      "title": "Internship in Industrial and Organizational Psychology I",
+      "level": "grad"
+    },
+    {
+      "code": "PSYC 7799G",
+      "title": "Internship in Industrial and Organizational Psychology II",
+      "level": "grad"
+    },
+    {
+      "code": "PSYC 7801G",
+      "title": "Survey in Psychological Science",
+      "level": "grad"
+    },
+    {
+      "code": "PSYC 7802G",
+      "title": "Survey in Psychological Science II",
+      "level": "grad"
+    },
+    {
+      "code": "PSYC U7700G",
+      "title": "History of Psychology",
+      "level": "grad"
+    },
+    {
+      "code": "PSYC U7703G",
+      "title": "Design of Psychological Research",
+      "level": "grad"
+    },
+    {
+      "code": "PSYC U7704G",
+      "title": "Instrumentation in Experimental Psychology",
+      "level": "grad"
+    },
+    {
+      "code": "PSYC U7705G",
+      "title": "Statistical Methods in Psychology I",
+      "level": "grad"
+    },
+    {
+      "code": "PSYC U7706G",
+      "title": "Statistical Methods in Psychology II",
+      "level": "grad"
+    },
+    {
+      "code": "PSYC U7707G",
+      "title": "Multivariate Statistical Methods",
+      "level": "grad"
+    },
+    {
+      "code": "PSYC U7710G",
+      "title": "Advanced Physiological Psychology I",
+      "level": "grad"
+    },
+    {
+      "code": "PSYC U7716G",
+      "title": "Comparative Psychology",
+      "level": "grad"
+    },
+    {
+      "code": "PSYC U7718G",
+      "title": "Ethology",
+      "level": "grad"
+    },
+    {
+      "code": "PSYC U7720G",
+      "title": "Developmental Psychology",
+      "level": "grad"
+    },
+    {
+      "code": "PSYC U7730G",
+      "title": "Psychology of Learning",
+      "level": "grad"
+    },
+    {
+      "code": "PSYC U7733G",
+      "title": "Information and Decision Processes in Human Behavior",
+      "level": "grad"
+    },
+    {
+      "code": "PSYC U7737G",
+      "title": "Development of Cognition",
+      "level": "grad"
+    },
+    {
+      "code": "PSYC U7738G",
+      "title": "Cognitive Psychology",
+      "level": "grad"
+    },
+    {
+      "code": "PSYC U7743G",
+      "title": "Psychology of Emotion",
+      "level": "grad"
+    },
+    {
+      "code": "PSYC U7746G",
+      "title": "Advanced Social Psychology",
+      "level": "grad"
+    },
+    {
+      "code": "PSYC U7747G",
+      "title": "Experimental Social Psychology",
+      "level": "grad"
+    },
+    {
+      "code": "PSYC U7751G",
+      "title": "Computer Simulation of Psychological Process",
+      "level": "grad"
+    },
+    {
+      "code": "PSYC U7752G",
+      "title": "Language and Thought",
+      "level": "grad"
+    },
+    {
+      "code": "PSYC U7753X",
+      "title": "Foundations of Cognitive Science",
+      "level": "grad"
+    },
+    {
+      "code": "PSYC U7754G",
+      "title": "Natural-Language Processing",
+      "level": "grad"
+    },
+    {
+      "code": "PSYC U7755G",
+      "title": "Psychopathology",
+      "level": "grad"
+    },
+    {
+      "code": "PSYC U7763G",
+      "title": "Psychophysical Methods",
+      "level": "grad"
+    },
+    {
+      "code": "PSYC U7771G",
+      "title": "Ethical and Legal Issues for Psychologists",
+      "level": "grad"
+    }
+  ]
+}

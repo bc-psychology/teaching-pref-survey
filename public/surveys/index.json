@@ -10,5 +10,13 @@
   {
     "id": "pipeline-test",
     "title": "Pipeline test — Teaching Preferences Survey — Faculty, Spring 2027"
+  },
+  {
+    "id": "sim-faculty-2027-spring",
+    "title": "Simulation — Teaching Preferences Survey — Faculty, Spring 2027"
+  },
+  {
+    "id": "sim-adjunct-student-2027-spring",
+    "title": "Simulation — Teaching Preferences Survey — Adjunct and Student Instructors, Spring 2027"
   }
 ]
