@@ -13,7 +13,8 @@
     "examples": "tsx scripts/export-examples.ts",
     "links": "tsx scripts/make-links.ts",
     "worker:dev": "wrangler dev -c worker/wrangler.toml --port 8787",
-    "worker:deploy": "wrangler deploy -c worker/wrangler.toml"
+    "worker:deploy": "wrangler deploy -c worker/wrangler.toml",
+    "simulate": "tsx scripts/simulate-responses.ts"
   },
   "dependencies": {
     "react": "^19.3.1",
