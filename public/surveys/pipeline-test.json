@@ -6,6 +6,7 @@
   "term": "2027-spring",
   "version": 1,
   "closes": "2026-12-04",
+  "submit_url": "https://teaching-pref-survey.teaching-pref-survey.workers.dev/submit",
   "intro": "This survey is for the **Spring 2027** semester, with an extra question if you want to teach over the **Winter 2027** intersession too.\n\nPlease give as much detail as possible. If we missed anything, you can tell us in the last question. Thanks!",
   "thanks": "Thank you! Your answers help us build the schedule. If anything changes, you can submit again with the same link and we will use your latest answers.",
   "questions": [
@@ -1111,6 +1112,5 @@
       "title": "Ethical and Legal Issues for Psychologists",
       "level": "grad"
     }
-  ],
-  "submit_url": "https://teaching-pref-survey.teaching-pref-survey.workers.dev/submit"
+  ]
 }
