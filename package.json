@@ -10,7 +10,10 @@
     "test": "vitest run",
     "typecheck": "tsc --noEmit -p tsconfig.json",
     "catalog": "tsx scripts/import-catalog.ts",
-    "examples": "tsx scripts/export-examples.ts"
+    "examples": "tsx scripts/export-examples.ts",
+    "links": "tsx scripts/make-links.ts",
+    "worker:dev": "wrangler dev -c worker/wrangler.toml --port 8787",
+    "worker:deploy": "wrangler deploy -c worker/wrangler.toml"
   },
   "dependencies": {
     "react": "^19.3.1",
@@ -25,6 +28,7 @@
     "tsx": "^4.23.15",
     "typescript": "^7.0.2",
     "vite": "^8.3.6",
-    "vitest": "^5.1.0"
+    "vitest": "^5.1.0",
+    "wrangler": "^4.158.0"
   }
 }

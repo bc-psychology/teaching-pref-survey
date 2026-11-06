@@ -1,0 +1,4 @@
+# Copy to .dev.vars for `npx wrangler dev` (never commit .dev.vars).
+GITHUB_TOKEN=github_pat_...
+# Point at the local dev site so an unpublished test survey can be used:
+SURVEYS_BASE=http://localhost:5191/surveys/

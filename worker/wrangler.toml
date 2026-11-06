@@ -1,0 +1,12 @@
+# Response collector for the teaching preferences survey.
+# Deploy:  cd worker && npx wrangler deploy
+# Secret:  npx wrangler secret put GITHUB_TOKEN
+name = "teaching-pref-survey"
+main = "src/index.ts"
+compatibility_date = "2026-11-01"
+
+[vars]
+RESPONSES_REPO = "bc-psychology/teaching-pref-responses"
+RESPONSES_BRANCH = "main"
+ALLOWED_ORIGINS = "https://bc-psychology.github.io,http://localhost:5191"
+SURVEYS_BASE = "https://bc-psychology.github.io/teaching-pref-survey/surveys/"

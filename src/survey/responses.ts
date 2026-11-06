@@ -15,6 +15,7 @@ export function readResponse(data: unknown): ResponseFile {
 export function responsesTable(survey: Survey, responses: ResponseFile[]): (string | number)[][] {
   const cols: { header: string; get: (r: ResponseFile) => string | number }[] = [
     { header: "submitted_at", get: (r) => r.submitted_at },
+    { header: "person_id", get: (r) => r.person_id ?? "" },
     { header: "token", get: (r) => r.token ?? "" },
     { header: "survey_version", get: (r) => r.survey_version },
   ];

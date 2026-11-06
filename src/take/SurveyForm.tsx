@@ -35,6 +35,8 @@ export function SurveyForm({ survey, token, preview }: { survey: Survey; token?:
   const asked = shown.filter((q) => q.type !== "info");
   const answered = asked.filter((q) => cleanAnswers(survey, answers)[q.id] !== undefined).length;
   const closed = !preview && isClosed(survey);
+  /** A live survey (one with a submit address) only accepts answers from personal links. */
+  const needsLink = !preview && !!survey.submit_url && !token;
 
   const set = (id: string, v: Answers[string]) => setAnswers((a) => ({ ...a, [id]: v }));
 
@@ -66,8 +68,9 @@ export function SurveyForm({ survey, token, preview }: { survey: Survey; token?:
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ token, surveyId: survey.id, surveyVersion: survey.version, answers: response.answers }),
         });
-        if (!res.ok) throw new Error((await res.text().catch(() => "")) || `The server answered ${res.status}.`);
-        setPhase({ kind: "done", response, sent: true });
+        const reply = (await res.json().catch(() => ({}))) as { message?: string; submittedAt?: string };
+        if (!res.ok) throw new Error(reply.message || `The server answered ${res.status}.`);
+        setPhase({ kind: "done", response: { ...response, submitted_at: reply.submittedAt ?? response.submitted_at }, sent: true });
       } catch (e) {
         setPhase({ kind: "failed", response, error: e instanceof Error ? e.message : String(e) });
       }
@@ -175,6 +178,15 @@ export function SurveyForm({ survey, token, preview }: { survey: Survey; token?:
         )}
       </header>
 
+      {needsLink && !closed && (
+        <div className="notice error">
+          <h2>Please use your personal link</h2>
+          <p>
+            This survey only accepts answers through the personal link in your email, so we know whose answers they are.
+            {survey.contact ? <> If you can't find it, write to {survey.contact}.</> : null}
+          </p>
+        </div>
+      )}
       {closed ? (
         <div className="notice error">
           <h2>This survey is closed</h2>
@@ -216,7 +228,7 @@ export function SurveyForm({ survey, token, preview }: { survey: Survey; token?:
                 {Object.keys(problems).length === 1 ? "One question needs" : `${Object.keys(problems).length} questions need`} attention.
               </span>
             )}
-            <button type="submit" className="primary" disabled={phase.kind === "sending"}>
+            <button type="submit" className="primary" disabled={phase.kind === "sending" || needsLink}>
               {phase.kind === "sending" ? "Sending…" : "Submit"}
             </button>
           </div>

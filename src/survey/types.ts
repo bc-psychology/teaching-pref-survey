@@ -136,6 +136,8 @@ export interface ResponseFile {
   term?: string;
   /** From the personal link (?t=…), when there is one. */
   token?: string;
+  /** Added by the response collector from the personal link's token. */
+  person_id?: string;
   submitted_at: string;
   answers: Answers;
 }

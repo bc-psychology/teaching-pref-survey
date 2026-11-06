@@ -16,6 +16,18 @@ there; GitHub Pages rebuilds the site (`.github/workflows/pages.yml`).
 download their answers as a file at the end. The builder's Responses tab turns those files
 into one Excel sheet.
 
+## Collecting answers
+
+`worker/` is the response collector, a Cloudflare Worker. It takes `POST /submit` from the
+survey page, checks the personal-link token against `tokens.json` in the private responses
+repo, checks the answers against the published survey (closing date, required questions),
+and commits them as `responses/<survey id>/<person id>.json` in that repo. A resubmission
+overwrites the file, and git history keeps the earlier versions. `npm run links` makes the
+tokens and the mail-merge list. A survey becomes live when its `submit_url` points at the
+Worker. After that, the page only accepts answers through personal links.
+
+Setting it up and testing it end to end: [docs/testing-the-pipeline.md](docs/testing-the-pipeline.md).
+
 ## Working on it
 
 ```bash
@@ -25,6 +37,9 @@ npm test
 npm run build      # into dist/
 npm run examples   # re-save surveys in canonical form + Excel copies in examples/
 npm run catalog    # refresh public/data/courses.json from ../PsychScheduling
+npm run links -- people.csv --survey <id>   # personal links → private/ (git-ignored)
+npm run worker:dev                          # the Worker on http://localhost:8787
+npm run worker:deploy
 ```
 
 ## Survey format

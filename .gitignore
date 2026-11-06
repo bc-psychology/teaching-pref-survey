@@ -3,3 +3,8 @@ dist/
 .DS_Store
 *.local
 responses/
+
+# Worker secrets and generated personal links
+.dev.vars
+.wrangler/
+private/

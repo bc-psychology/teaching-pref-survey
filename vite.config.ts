@@ -12,9 +12,9 @@ export default defineConfig({
     target: "es2022",
     rollupOptions: {
       input: {
-        index: resolve(__dirname, "index.html"),
-        take: resolve(__dirname, "take.html"),
-        build: resolve(__dirname, "build.html"),
+        index: resolve(import.meta.dirname, "index.html"),
+        take: resolve(import.meta.dirname, "take.html"),
+        build: resolve(import.meta.dirname, "build.html"),
       },
     },
   },

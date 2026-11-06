@@ -325,7 +325,8 @@ export function checkSurvey(s: Survey): SurveyIssue[] {
   if (!s.id || !/^[a-z0-9][a-z0-9-]*$/.test(s.id)) err("survey", "The survey id must use lowercase letters, digits and dashes (it becomes the file name).");
   if (!s.title?.trim()) err("survey", "The survey needs a title.");
   if (s.closes && !/^\d{4}-\d{2}-\d{2}$/.test(s.closes)) err("survey", "The closing date must look like 2026-12-01.");
-  if (s.submit_url && !/^https:\/\//.test(s.submit_url)) err("survey", "The submit address must start with https://.");
+  if (s.submit_url && !/^(https:\/\/|http:\/\/localhost(:\d+)?\/)/.test(s.submit_url))
+    err("survey", "The submit address must start with https:// (or http://localhost for local testing).");
   if (!s.questions.length) err("survey", "The survey has no questions.");
 
   const seen = new Set<string>();
