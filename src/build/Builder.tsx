@@ -1,7 +1,19 @@
-import { useEffect, useMemo, useState, type ReactNode } from "react";
-import { checkSurvey, formatSettings, parseSettings, surveyFromJson, surveyToJson, type SurveyIssue } from "../survey/logic";
-import { responsesToXlsxBytes, readResponse } from "../survey/responses";
-import { QUESTION_TYPES, SCHEMA_VERSION, SURVEY_FORMAT, TYPE_HELP, type AnswerValue, type Course, type Question, type QuestionType, type ResponseFile, type Survey } from "../survey/types";
+import { Fragment, useEffect, useMemo, useState, type ReactNode } from "react";
+import { checkSurvey, formatSettings, parseSettings, surveyFromJson, surveyToJson, visibleQuestions, type SurveyIssue } from "../survey/logic";
+import {
+  courseDemand,
+  latestPerPerson,
+  notResponded,
+  readPeopleList,
+  readResponse,
+  respondentKey,
+  respondentName,
+  responseBundle,
+  responsesToXlsxBytes,
+  type ListedPerson,
+} from "../survey/responses";
+import { answerSummary } from "../survey/summary";
+import { QUESTION_TYPES, SCHEMA_VERSION, SURVEY_FORMAT, TYPE_HELP, type AnswerValue, type Course, type CourseAnswer, type Question, type QuestionType, type ResponseFile, type Survey } from "../survey/types";
 import { surveyFromXlsxBytes, surveyToXlsxBytes } from "../survey/xlsx";
 import { downloadBytes, downloadText, fetchJson, XLSX_TYPE } from "../shared/files";
 import { QuestionView } from "../take/inputs";
@@ -590,33 +602,86 @@ function CoursesTab({ survey, patch, catalog }: { survey: Survey; patch: (p: Par
 
 // ---------------- Responses ----------------
 
-function ResponsesTab({ survey }: { survey: Survey }) {
-  const [responses, setResponses] = useState<ResponseFile[]>([]);
-  const [skipped, setSkipped] = useState<string[]>([]);
-  const [over, setOver] = useState(false);
+type RespView = "people" | "courses" | "missing";
 
-  async function add(files: FileList | File[]) {
+/** Every file under a dropped folder (or the dropped files themselves). */
+async function droppedFiles(dt: DataTransfer): Promise<File[]> {
+  const entries = Array.from(dt.items)
+    .map((i) => i.webkitGetAsEntry?.())
+    .filter((e): e is FileSystemEntry => !!e);
+  if (!entries.length) return Array.from(dt.files);
+  const out: File[] = [];
+  const walk = async (e: FileSystemEntry): Promise<void> => {
+    if (e.isFile) out.push(await new Promise<File>((res, rej) => (e as FileSystemFileEntry).file(res, rej)));
+    else if (e.isDirectory) {
+      const reader = (e as FileSystemDirectoryEntry).createReader();
+      for (;;) {
+        const batch = await new Promise<FileSystemEntry[]>((res, rej) => reader.readEntries(res, rej));
+        if (!batch.length) break;
+        for (const c of batch) await walk(c);
+      }
+    }
+  };
+  for (const e of entries) await walk(e);
+  return out;
+}
+
+function ResponsesTab({ survey }: { survey: Survey }) {
+  const [files, setFiles] = useState<ResponseFile[]>([]);
+  const [skipped, setSkipped] = useState<string[]>([]);
+  const [otherSurveys, setOtherSurveys] = useState<Record<string, number>>({});
+  const [people, setPeople] = useState<ListedPerson[] | null>(null);
+  const [over, setOver] = useState(false);
+  const [view, setView] = useState<RespView>("people");
+  const [open, setOpen] = useState<string | null>(null);
+
+  const responses = useMemo(() => latestPerPerson(files), [files]);
+  const courseQs = survey.questions.filter((q) => q.type === "courses");
+  const missing = useMemo(() => (people ? notResponded(people, responses) : []), [people, responses]);
+
+  async function add(list: FileList | File[]) {
     const ok: ResponseFile[] = [];
     const bad: string[] = [];
-    for (const f of Array.from(files)) {
+    const other: Record<string, number> = {};
+    for (const f of Array.from(list)) {
+      if (!/\.json$/i.test(f.name) || f.name === "tokens.json") continue;
       try {
         const r = readResponse(JSON.parse(await f.text()));
-        if (r.survey_id !== survey.id) bad.push(`${f.name} (answers ${r.survey_id}, not ${survey.id})`);
+        if (r.survey_id !== survey.id) other[r.survey_id] = (other[r.survey_id] ?? 0) + 1;
         else ok.push(r);
       } catch {
         bad.push(`${f.name} (not a response file)`);
       }
     }
-    setResponses((prev) => [...prev, ...ok]);
+    setFiles((prev) => [...prev, ...ok]);
     setSkipped((prev) => [...prev, ...bad]);
+    setOtherSurveys((prev) => {
+      const next = { ...prev };
+      for (const [k, n] of Object.entries(other)) next[k] = (next[k] ?? 0) + n;
+      return next;
+    });
   }
 
+  async function addPeople(f: File) {
+    try {
+      const list = readPeopleList(await f.arrayBuffer());
+      if (!list.length) throw new Error("no rows with an id column");
+      setPeople(list);
+      setView("missing");
+    } catch (e) {
+      setSkipped((prev) => [...prev, `${f.name} (${e instanceof Error ? e.message : "not a people list"})`]);
+    }
+  }
+
+  const replaced = files.length - responses.length;
+  const others = Object.entries(otherSurveys);
+
   return (
-    <div className="panel" style={{ maxWidth: 820 }}>
-      <h2>Responses to Excel</h2>
+    <div className="panel" style={{ maxWidth: 1100 }}>
+      <h2>Responses</h2>
       <p className="muted small">
-        Drop response files (the JSON files people download in pilot mode, or files from the responses repo) to make one spreadsheet, one row per response.
-        Files stay in this browser; nothing is uploaded.
+        Load the files for <code>{survey.id}</code>: choose its folder in your copy of the responses repo (<code>responses/{survey.id}/</code>, after{" "}
+        <code>git pull</code>), or drop files or folders here. Files stay in this browser; nothing is uploaded.
       </p>
       <div
         className={`dropzone${over ? " over" : ""}`}
@@ -628,20 +693,60 @@ function ResponsesTab({ survey }: { survey: Survey }) {
         onDrop={(e) => {
           e.preventDefault();
           setOver(false);
-          void add(e.dataTransfer.files);
+          void droppedFiles(e.dataTransfer).then(add);
         }}
       >
-        <p>Drop .json response files here, or</p>
+        <p>Drop response files or folders here, or</p>
+        <label className="secondary" style={{ display: "inline-block", marginRight: "0.5rem" }}>
+          Choose folder…
+          <input
+            type="file"
+            multiple
+            style={{ display: "none" }}
+            ref={(el) => el?.setAttribute("webkitdirectory", "")}
+            onChange={(e) => {
+              if (e.target.files) void add(e.target.files);
+              e.target.value = "";
+            }}
+          />
+        </label>
         <label className="secondary" style={{ display: "inline-block" }}>
           Choose files…
-          <input type="file" accept=".json" multiple style={{ display: "none" }} onChange={(e) => e.target.files && void add(e.target.files)} />
+          <input
+            type="file"
+            accept=".json"
+            multiple
+            style={{ display: "none" }}
+            onChange={(e) => {
+              if (e.target.files) void add(e.target.files);
+              e.target.value = "";
+            }}
+          />
         </label>
       </div>
       <p>
-        <strong>{responses.length}</strong> response{responses.length === 1 ? "" : "s"} loaded for <code>{survey.id}</code>.
+        <strong>{responses.length}</strong> {responses.length === 1 ? "person" : "people"} responded
+        {replaced > 0 && (
+          <span className="muted">
+            {" "}
+            ({replaced} earlier submission{replaced === 1 ? "" : "s"} replaced by a newer one)
+          </span>
+        )}
+        {people && (
+          <span className="muted">
+            {" "}
+            · {people.length} on the people list, {missing.length} not yet responded
+          </span>
+        )}
+        .
       </p>
-      {skipped.length > 0 && (
+      {(skipped.length > 0 || others.length > 0) && (
         <ul className="issues">
+          {others.map(([id, n]) => (
+            <li key={id} className="warning">
+              Left out {n} file{n === 1 ? "" : "s"} for another survey ({id}). Open that survey to see them.
+            </li>
+          ))}
           {skipped.map((s, i) => (
             <li key={i} className="warning">
               Skipped {s}
@@ -656,12 +761,208 @@ function ResponsesTab({ survey }: { survey: Survey }) {
           disabled={!responses.length}
           onClick={() => downloadBytes(`${survey.id}-responses.xlsx`, responsesToXlsxBytes(survey, responses), XLSX_TYPE)}
         >
-          Download responses as Excel
+          Download as Excel
         </button>
-        <button type="button" className="secondary" disabled={!responses.length && !skipped.length} onClick={() => (setResponses([]), setSkipped([]))}>
+        <button
+          type="button"
+          className="secondary"
+          disabled={!responses.length}
+          title="One file with the survey and every response, for PsychScheduling"
+          onClick={() => downloadText(`${survey.id}-bundle.json`, JSON.stringify(responseBundle(survey, responses), null, 2) + "\n", "application/json")}
+        >
+          Download bundle for PsychScheduling
+        </button>
+        <label className="filebtn secondary">
+          {people ? "Replace people list…" : "Add people list…"}
+          <input
+            type="file"
+            accept=".csv,.xlsx"
+            onChange={(e) => {
+              const f = e.target.files?.[0];
+              if (f) void addPeople(f);
+              e.target.value = "";
+            }}
+          />
+        </label>
+        <button
+          type="button"
+          className="secondary"
+          disabled={!files.length && !skipped.length && !people}
+          onClick={() => (setFiles([]), setSkipped([]), setOtherSurveys({}), setPeople(null), setOpen(null))}
+        >
           Clear
         </button>
       </div>
+      {(responses.length > 0 || people) && (
+        <>
+          <nav className="tabs" style={{ padding: 0, margin: "1rem 0" }}>
+            <button type="button" className={view === "people" ? "on" : ""} onClick={() => setView("people")}>
+              People <span className="badge">{responses.length}</span>
+            </button>
+            <button type="button" className={view === "courses" ? "on" : ""} onClick={() => setView("courses")} disabled={!courseQs.length}>
+              By course
+            </button>
+            <button type="button" className={view === "missing" ? "on" : ""} onClick={() => setView("missing")}>
+              Not yet responded {people && <span className="badge">{missing.length}</span>}
+            </button>
+          </nav>
+          {view === "people" && <ResponsePeople survey={survey} responses={responses} open={open} setOpen={setOpen} />}
+          {view === "courses" && courseQs.map((q) => <CourseDemandTable key={q.id} survey={survey} responses={responses} q={q} />)}
+          {view === "missing" &&
+            (people ? (
+              missing.length ? (
+                <table className="ctable">
+                  <thead>
+                    <tr>
+                      <th>Name</th>
+                      <th>Email</th>
+                      <th>id</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {missing.map((p) => (
+                      <tr key={p.id}>
+                        <td>{p.name}</td>
+                        <td>{p.email}</td>
+                        <td>
+                          <code>{p.id}</code>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              ) : (
+                <p>Everyone on the list has responded.</p>
+              )
+            ) : (
+              <p className="muted small">
+                Add the people list (the <code>private/links-{survey.id}.csv</code> file from <code>npm run links</code>, or any list with id, name and email
+                columns) to see who has not responded yet.
+              </p>
+            ))}
+        </>
+      )}
+    </div>
+  );
+}
+
+/** One row per person; a row opens that person's answers in plain words. */
+function ResponsePeople({ survey, responses, open, setOpen }: { survey: Survey; responses: ResponseFile[]; open: string | null; setOpen: (k: string | null) => void }) {
+  const firstCourses = survey.questions.find((q) => q.type === "courses");
+  const yesnos = survey.questions.filter((q) => q.type === "yesno").slice(0, 3);
+  return (
+    <table className="ctable responses">
+      <thead>
+        <tr>
+          <th>Name</th>
+          {yesnos.map((q) => (
+            <th key={q.id}>
+              <code>{q.id}</code>
+            </th>
+          ))}
+          {firstCourses && <th>Courses ({firstCourses.id}), in rank order</th>}
+          <th>Submitted</th>
+        </tr>
+      </thead>
+      <tbody>
+        {responses.map((r) => {
+          const key = respondentKey(r);
+          const isOpen = open === key;
+          return (
+            <Fragment key={key}>
+              <tr className={`clickable${isOpen ? " on" : ""}`} onClick={() => setOpen(isOpen ? null : key)}>
+                <td>
+                  <button type="button" className="link" aria-expanded={isOpen}>
+                    {respondentName(r) || "(no name)"}
+                  </button>
+                </td>
+                {yesnos.map((q) => (
+                  <td key={q.id}>{String(r.answers[q.id] ?? "")}</td>
+                ))}
+                {firstCourses && <td>{((r.answers[firstCourses.id] as CourseAnswer[] | undefined) ?? []).map((c) => c.code).join(", ")}</td>}
+                <td className="small muted">{new Date(r.submitted_at).toLocaleString()}</td>
+              </tr>
+              {isOpen && (
+                <tr className="detail">
+                  <td colSpan={3 + yesnos.length}>
+                    <ResponseDetail survey={survey} r={r} />
+                  </td>
+                </tr>
+              )}
+            </Fragment>
+          );
+        })}
+      </tbody>
+    </table>
+  );
+}
+
+function ResponseDetail({ survey, r }: { survey: Survey; r: ResponseFile }) {
+  const qs = visibleQuestions(survey, r.answers).filter((q) => q.type !== "info");
+  return (
+    <div>
+      <p className="small muted">
+        person_id <code>{r.person_id ?? "—"}</code> · survey version {r.survey_version} · submitted {new Date(r.submitted_at).toLocaleString()}
+      </p>
+      <dl className="summary">
+        {qs.map((q) => {
+          const lines = answerSummary(survey, q, r.answers[q.id]);
+          return (
+            <div key={q.id}>
+              <dt>
+                {q.text} <code className="small muted">{q.id}</code>
+              </dt>
+              <dd>{lines.length ? lines.map((l, i) => <div key={i}>{l}</div>) : <span className="muted">No answer</span>}</dd>
+            </div>
+          );
+        })}
+      </dl>
+    </div>
+  );
+}
+
+function CourseDemandTable({ survey, responses, q }: { survey: Survey; responses: ResponseFile[]; q: Question }) {
+  const rows = courseDemand(survey, responses, q.id);
+  const ranks = Math.max(3, ...rows.map((d) => d.byRank.length));
+  return (
+    <div style={{ marginBottom: "1.5rem" }}>
+      <h3>
+        {q.text} <code className="small muted">{q.id}</code>
+      </h3>
+      {rows.length ? (
+        <table className="ctable">
+          <thead>
+            <tr>
+              <th>Course</th>
+              <th>People</th>
+              {Array.from({ length: ranks }, (_, i) => (
+                <th key={i} title={`Ranked ${i + 1}`}>
+                  #{i + 1}
+                </th>
+              ))}
+              <th>Who (highest rank first)</th>
+            </tr>
+          </thead>
+          <tbody>
+            {rows.map((d) => (
+              <tr key={d.code}>
+                <td>
+                  <strong>{d.code}</strong> <span className="small muted">{d.title}</span>
+                </td>
+                <td>{d.count}</td>
+                {Array.from({ length: ranks }, (_, i) => (
+                  <td key={i} className="small">
+                    {d.byRank[i] || ""}
+                  </td>
+                ))}
+                <td className="small">{d.people.join(", ")}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      ) : (
+        <p className="muted small">Nobody chose a course here.</p>
+      )}
     </div>
   );
 }

@@ -6,8 +6,9 @@ on GitHub Pages.
 - **`take.html?s=<survey id>`** is the page instructors get a link to. It shows one survey,
   saves answers in their browser as they go, and checks required answers before submitting.
 - **`build.html`** is the survey builder for the department team: edit questions, the course
-  list and settings, preview the survey, import and export Excel, publish, and turn response
-  files into a spreadsheet.
+  list and settings, preview the survey, import and export Excel, publish, and look at the
+  responses (per person, demand by course, who has not responded) with exports to Excel and
+  a bundle for PsychScheduling ([docs/response-bundle.md](docs/response-bundle.md)).
 
 Surveys are JSON files in `public/surveys/`. Publishing a survey means committing its file
 there; GitHub Pages rebuilds the site (`.github/workflows/pages.yml`).
@@ -38,6 +39,7 @@ npm run build      # into dist/
 npm run examples   # re-save surveys in canonical form + Excel copies in examples/
 npm run catalog    # refresh public/data/courses.json from ../PsychScheduling
 npm run links -- people.csv --survey <id>   # personal links → private/ (git-ignored)
+npm run simulate -- people.csv private/links-<id>.csv   # fake responses through the Worker (--dry)
 npm run worker:dev                          # the Worker on http://localhost:8787
 npm run worker:deploy
 ```

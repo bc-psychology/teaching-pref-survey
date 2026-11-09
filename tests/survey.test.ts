@@ -12,7 +12,7 @@ import {
   surveyToJson,
   visibleQuestions,
 } from "../src/survey/logic";
-import { responsesTable } from "../src/survey/responses";
+import { courseDemand, latestPerPerson, notResponded, readPeopleList, responseBundle, responsesTable } from "../src/survey/responses";
 import { answerSummary } from "../src/survey/summary";
 import type { Answers, ResponseFile, Survey } from "../src/survey/types";
 import { surveyFromXlsxBytes, surveyToXlsxBytes } from "../src/survey/xlsx";
@@ -110,5 +110,51 @@ describe("answering the adjunct survey", () => {
     expect(row[head.indexOf("availability W 18:30-19:45")]).toBe("preferred");
     const avail = s.questions.find((q) => q.id === "availability")!;
     expect(answerSummary(s, avail, r.answers.availability)).toEqual(["Monday: 8:00 am–12:15 pm", "Wednesday: 6:30–7:45 pm (preferred)"]);
+  });
+});
+
+describe("looking at responses", () => {
+  const s = load("faculty-2027-spring");
+  const resp = (person_id: string, at: string, courses: string[], name = person_id): ResponseFile => ({
+    format: "tps-response",
+    survey_id: s.id,
+    survey_version: 1,
+    person_id,
+    token: "secret-token-1234567",
+    submitted_at: at,
+    answers: { name, courses: courses.map((code) => ({ code })) },
+  });
+  const files = [
+    resp("p1", "2026-11-01T10:00:00Z", ["PSYC 1000"], "Ann"),
+    resp("p1", "2026-11-02T10:00:00Z", ["PSYC 2001", "PSYC 1000"], "Ann"),
+    resp("p2", "2026-11-01T12:00:00Z", ["PSYC 1000"], "Bo"),
+  ];
+
+  it("keeps the latest submission per person", () => {
+    const latest = latestPerPerson(files);
+    expect(latest.map((r) => [r.person_id, r.submitted_at])).toEqual([
+      ["p1", "2026-11-02T10:00:00Z"],
+      ["p2", "2026-11-01T12:00:00Z"],
+    ]);
+  });
+
+  it("counts course demand by rank", () => {
+    const d = courseDemand(s, latestPerPerson(files), "courses");
+    expect(d[0]).toMatchObject({ code: "PSYC 1000", count: 2, byRank: [1, 1], people: ["Bo", "Ann"] });
+    expect(d[1]).toMatchObject({ code: "PSYC 2001", count: 1, byRank: [1] });
+  });
+
+  it("bundles the survey with one response per person and no tokens", () => {
+    const b = responseBundle(s, files, new Date("2026-11-09T00:00:00Z"));
+    expect(b).toMatchObject({ format: "tps-response-bundle", bundle_version: 1, exported_at: "2026-11-09T00:00:00.000Z" });
+    expect(b.survey.id).toBe(s.id);
+    expect(b.responses).toHaveLength(2);
+    expect(b.responses.some((r) => "token" in r)).toBe(false);
+  });
+
+  it("finds people who have not responded", () => {
+    const csv = new TextEncoder().encode("id,name,email,link\np1,Ann,a@x.edu,https://x\np3,Cy,c@x.edu,https://x\n");
+    const people = readPeopleList(csv);
+    expect(notResponded(people, latestPerPerson(files)).map((p) => p.id)).toEqual(["p3"]);
   });
 });

@@ -6,7 +6,8 @@
  * The input (Excel or CSV) needs columns id, name, email (id = the person's id in the
  * scheduler; letters, digits, - and _). Writes, into the git-ignored private/ folder:
  *   private/tokens.json            → copy to the PRIVATE responses repo as tokens.json
- *   private/links-<survey>.csv     → name, email, link for the mail merge
+ *   private/links-<survey>.csv     → id, name, email, link for the mail merge (and the builder's
+ *                                    "Not yet responded" list)
  * People already in private/tokens.json keep their token, so links sent earlier keep working.
  * Never commit either file to this (public) repository.
  */
@@ -39,7 +40,7 @@ const tokensPath = "private/tokens.json";
 const tokens: Record<string, string> = existsSync(tokensPath) ? JSON.parse(readFileSync(tokensPath, "utf8")) : {};
 const byPerson = new Map(Object.entries(tokens).map(([t, id]) => [id, t]));
 
-const lines = [["name", "email", "link"]];
+const lines = [["id", "name", "email", "link"]];
 let made = 0;
 for (const r of rows) {
   const id = col(r, "id");
@@ -55,7 +56,7 @@ for (const r of rows) {
     byPerson.set(id, t);
     made++;
   }
-  lines.push([col(r, "name"), col(r, "email"), new URL(`take.html?s=${survey}&t=${t}`, site).href]);
+  lines.push([id, col(r, "name"), col(r, "email"), new URL(`take.html?s=${survey}&t=${t}`, site).href]);
 }
 
 const csv = lines.map((l) => l.map((v) => (/[",\n]/.test(v) ? `"${v.replace(/"/g, '""')}"` : v)).join(",")).join("\n") + "\n";

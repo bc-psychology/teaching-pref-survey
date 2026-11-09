@@ -222,3 +222,9 @@ pre.json { background: #0f172a; color: #e2e8f0; padding: 1rem; border-radius: 8p
 .dropzone.over { border-color: var(--accent); background: var(--accent-soft); }
 code { background: var(--bg); padding: 0.05rem 0.3rem; border-radius: 4px; font-size: 0.88em; }
 .toast { position: fixed; bottom: 1rem; left: 50%; transform: translateX(-50%); background: var(--ink); color: #fff; padding: 0.6rem 1rem; border-radius: 8px; z-index: 50; }
+
+/* Responses tab */
+.ctable.responses tr.clickable { cursor: pointer; }
+.ctable.responses tr.clickable:hover td, .ctable.responses tr.on td { background: #f3f6fb; }
+.ctable.responses tr.detail td { background: #fafbfd; padding: 0.75rem 1rem; }
+.ctable.responses .summary { margin: 0; }
