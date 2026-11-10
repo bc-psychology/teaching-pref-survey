@@ -203,7 +203,15 @@ export function Builder() {
             <SurveyForm key={JSON.stringify(survey.questions.map((q) => q.id))} survey={survey} preview />
           </div>
         )}
-        {tab === "responses" && <ResponsesTab survey={survey} />}
+        {tab === "responses" && (
+          <ResponsesTab
+            survey={survey}
+            published={published}
+            onOpen={(id) => {
+              if (confirm(`Open ${id}? Your current draft will be replaced (download it first if you need it).`)) void loadPublished(id);
+            }}
+          />
+        )}
         {tab === "publish" && <PublishTab survey={survey} issues={issues} published={published} />}
       </div>
       {toast && (
@@ -626,40 +634,39 @@ async function droppedFiles(dt: DataTransfer): Promise<File[]> {
   return out;
 }
 
-function ResponsesTab({ survey }: { survey: Survey }) {
-  const [files, setFiles] = useState<ResponseFile[]>([]);
+function ResponsesTab({ survey, published, onOpen }: { survey: Survey; published: { id: string; title: string }[]; onOpen: (id: string) => void }) {
+  // Every response file loaded, whatever its survey; the open survey's are shown. Opening
+  // another survey keeps them, so loading first and opening the survey second also works.
+  const [all, setAll] = useState<ResponseFile[]>([]);
   const [skipped, setSkipped] = useState<string[]>([]);
-  const [otherSurveys, setOtherSurveys] = useState<Record<string, number>>({});
   const [people, setPeople] = useState<ListedPerson[] | null>(null);
   const [over, setOver] = useState(false);
   const [view, setView] = useState<RespView>("people");
   const [open, setOpen] = useState<string | null>(null);
 
+  const files = useMemo(() => all.filter((r) => r.survey_id === survey.id), [all, survey.id]);
   const responses = useMemo(() => latestPerPerson(files), [files]);
+  const others = useMemo(() => {
+    const n: Record<string, number> = {};
+    for (const r of all) if (r.survey_id !== survey.id) n[r.survey_id] = (n[r.survey_id] ?? 0) + 1;
+    return Object.entries(n);
+  }, [all, survey.id]);
   const courseQs = survey.questions.filter((q) => q.type === "courses");
   const missing = useMemo(() => (people ? notResponded(people, responses) : []), [people, responses]);
 
   async function add(list: FileList | File[]) {
     const ok: ResponseFile[] = [];
     const bad: string[] = [];
-    const other: Record<string, number> = {};
     for (const f of Array.from(list)) {
       if (!/\.json$/i.test(f.name) || f.name === "tokens.json") continue;
       try {
-        const r = readResponse(JSON.parse(await f.text()));
-        if (r.survey_id !== survey.id) other[r.survey_id] = (other[r.survey_id] ?? 0) + 1;
-        else ok.push(r);
+        ok.push(readResponse(JSON.parse(await f.text())));
       } catch {
         bad.push(`${f.name} (not a response file)`);
       }
     }
-    setFiles((prev) => [...prev, ...ok]);
+    setAll((prev) => [...prev, ...ok]);
     setSkipped((prev) => [...prev, ...bad]);
-    setOtherSurveys((prev) => {
-      const next = { ...prev };
-      for (const [k, n] of Object.entries(other)) next[k] = (next[k] ?? 0) + n;
-      return next;
-    });
   }
 
   async function addPeople(f: File) {
@@ -674,7 +681,6 @@ function ResponsesTab({ survey }: { survey: Survey }) {
   }
 
   const replaced = files.length - responses.length;
-  const others = Object.entries(otherSurveys);
 
   return (
     <div className="panel" style={{ maxWidth: 1100 }}>
@@ -744,7 +750,14 @@ function ResponsesTab({ survey }: { survey: Survey }) {
         <ul className="issues">
           {others.map(([id, n]) => (
             <li key={id} className="warning">
-              Left out {n} file{n === 1 ? "" : "s"} for another survey ({id}). Open that survey to see them.
+              {n} file{n === 1 ? " is" : "s are"} for another survey, <code>{id}</code>.{" "}
+              {published.some((p) => p.id === id) ? (
+                <button type="button" onClick={() => onOpen(id)}>
+                  Open {id} to see {n === 1 ? "it" : "them"}
+                </button>
+              ) : (
+                "Open that survey (Open file…) to see them."
+              )}
             </li>
           ))}
           {skipped.map((s, i) => (
@@ -787,8 +800,8 @@ function ResponsesTab({ survey }: { survey: Survey }) {
         <button
           type="button"
           className="secondary"
-          disabled={!files.length && !skipped.length && !people}
-          onClick={() => (setFiles([]), setSkipped([]), setOtherSurveys({}), setPeople(null), setOpen(null))}
+          disabled={!all.length && !skipped.length && !people}
+          onClick={() => (setAll([]), setSkipped([]), setPeople(null), setOpen(null))}
         >
           Clear
         </button>
